@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'sinatra'
 require 'yaml'
 
 class URLShortener
