@@ -1,25 +1,24 @@
 require 'securerandom'
 require 'yaml'
 
-name = "Ayanokoji"
-zahl= 17
-
-def greet(name)
-    puts "welcome #{name}"
-end
-
-greet(name)
-
-class Person
-    def initialize(name,age)
-        @name= name
-        @age= age 
+class URLShortener
+    def initialize
+        @url_data= {}
     end
-     
-    def introduce
-        puts "Heloo, here is #{name}, he is #{age} old"
+
+    def shorten_url(long_url)
+        short_code= SecureRandom.alphanumeric(6)
+        @url_data[short_code]= long_url
+        puts "Short URL: http://short.ly/#{short_code}"
     end
 end
 
-person = new Person("Axi",17)
-person.introduce
+def test_url_shortener
+    shortener = URLShortener.new  
+    puts "Gib eine URL ein, um sie zu kürzen:"
+    long_url = gets.chomp  # Nimmt eine URL vom Benutzer entgegen
+    shortener.shorten_url(long_url)  
+  end
+  
+
+  test_url_shortener
