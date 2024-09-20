@@ -29,10 +29,21 @@ end
 
 def test_url_shortener
     shortener = URLShortener.new  
-    puts "Gib eine URL ein, um sie zu kürzen:"
-    long_url = gets.chomp  # scan user
-    shortener.shorten_url(long_url)  
-  end
-  
+    puts "Select what you wanna do -> (1: Shorten URL), (2 : Retrieve URL) "
+    choice = gets.chomp
+    
+    case choice
+    when "1"
+        puts "Enter a URL to shorten"
+        long_url = gets.chomp  # scan user
+        shortener.shorten_url(long_url)
+    when "2"
+        puts "Enter the short code to retrieve the original URL "
+        short_code = gets.chomp
+        shortener.retrieve_url(short_code)
+    else
+        puts "invalid choice, please neter either 1 or 2"
+    end
+end
 
   test_url_shortener
