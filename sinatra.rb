@@ -2,6 +2,7 @@ require 'sinatra'
 require 'securerandom'
 require 'yaml'
 require 'uri'
+require 'rqrcode'
 
 class URLShortener
   def initialize
@@ -24,6 +25,11 @@ class URLShortener
     long_url = URI.decode_www_form_component(encoded_url)
     puts "Retrieving URL for short code #{short_code}: #{long_url}"  # Debug
     long_url
+  end
+
+  def generate_url_code(url)
+    qrcode = RQRCode::QRCode.new(url)  # Fixed typo (should be RQRCode)
+    qrcode.as_svg(module_size: 6)
   end
 
   private
@@ -61,4 +67,13 @@ get '/:short_code' do
   else
     "Short URL not found!"
   end
+end
+
+# Route to generate QR code for a short URL
+get '/qr/:short_code' do
+  short_code = params[:short_code]
+  short_url = "http://localhost:4567/#{short_code}"
+
+  content_type 'image/svg+xml'
+  shortener.generate_url_code(short_url)
 end
