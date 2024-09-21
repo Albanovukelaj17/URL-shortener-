@@ -28,11 +28,11 @@ class URLShortener
   end
 
   def generate_url_code(url)
-    qrcode = RQRCode::QRCode.new(url)  # Fixed typo (should be RQRCode)
+    qrcode = RQRCode::QRCode.new(url)  # Correct QR code generation
     qrcode.as_svg(module_size: 6)
   end
 
-  private
+  private  # Mache die Hilfsmethoden "private"
 
   def load_urls
     YAML.load_file('urls.yml') if File.exist?('urls.yml')
