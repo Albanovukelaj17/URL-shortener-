@@ -3,6 +3,8 @@ require 'securerandom'
 require 'yaml'
 require 'uri'
 require 'rqrcode'
+require 'time'
+
 
 class URLShortener
   def initialize
@@ -12,15 +14,26 @@ class URLShortener
   def shorten_url(long_url)
     encoded_url = URI.encode_www_form_component(long_url)
     short_code = SecureRandom.alphanumeric(6)
-    @url_data[short_code] = encoded_url
+    @url_data[short_code] = {
+      'long_url' =>encoded_url,
+      'created_at' =>Time.now,
+      'last_access' => nil,
+      'click_count'=> 0
+       }
     save_urls
     short_code
   end
 
   def retrieve_url(short_code)
-    encoded_url = @url_data[short_code]
-    long_url = URI.decode_www_form_component(encoded_url)
-    long_url
+    data = @url_data[short_code]
+    if data:
+      data['last_accessed'] = Time.now
+      data['click_count'] += 1
+      save_urls
+      URI.decode_www_form_component(data['long_url'])
+    else
+      nil
+    end
   end
 
   def generate_url_code(url)
