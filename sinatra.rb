@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'securerandom'
 require 'yaml'
-require 'uri'  # Add URI to handle URL encoding/decoding
+require 'uri'
 
 class URLShortener
   def initialize
@@ -9,14 +9,21 @@ class URLShortener
   end
 
   def shorten_url(long_url)
+    # Percent-encode the long URL to handle non-ASCII characters
+    encoded_url = URI.encode_www_form_component(long_url)
     short_code = SecureRandom.alphanumeric(6)
-    @url_data[short_code] = long_url
+    @url_data[short_code] = encoded_url
     save_urls
+    puts "Shortened URL saved: #{short_code} => #{encoded_url}"  # Debug
     short_code
   end
 
   def retrieve_url(short_code)
-    @url_data[short_code]
+    encoded_url = @url_data[short_code]
+    # Decode the percent-encoded URL when retrieving it
+    long_url = URI.decode_www_form_component(encoded_url)
+    puts "Retrieving URL for short code #{short_code}: #{long_url}"  # Debug
+    long_url
   end
 
   private
@@ -35,17 +42,22 @@ shortener = URLShortener.new
 # Route to shorten a URL
 post '/shorten' do
   long_url = params[:url]
-  short_code = URI.encode(shortener.shorten_url(long_url))  # Encode the short code
+  short_code = URI.encode_www_form_component(shortener.shorten_url(long_url))  # Encode the short code
+  puts "Returning Short URL: http://localhost:4567/#{short_code}"  # Debug
   "Short URL: http://localhost:4567/#{short_code}"
 end
 
 # Route to handle redirection from short URL
 get '/:short_code' do
-  short_code = URI.decode(params[:short_code])  # Decode the short code
+  short_code = URI.decode_www_form_component(params[:short_code])  # Decode the short code
+  puts "Requested short code: #{short_code}"  # Debug
   long_url = shortener.retrieve_url(short_code)
 
   if long_url
-    redirect long_url
+    # Encode the long URL before redirecting to avoid the ASCII error
+    encoded_redirect_url = URI.encode(long_url)
+    puts "Redirecting to #{encoded_redirect_url}"  # Debug
+    redirect encoded_redirect_url
   else
     "Short URL not found!"
   end
