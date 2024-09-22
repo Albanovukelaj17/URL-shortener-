@@ -62,7 +62,9 @@ get '/' do
   <<-HTML
     <form action="/shorten" method="POST">
       <label for="url">Enter URL to shorten:</label>
-      <input type="text" id="url" name="url">
+      <input type="text" id="url" name="url" required><br><br>
+      <label for="custom_code">Enter custom short code (optional):</label>
+      <input type="text" id="custom_code" name="custom_code"><br><br>
       <button type="submit">Shorten URL</button>
     </form>
   HTML
@@ -71,13 +73,18 @@ end
 # Route to shorten a URL
 post '/shorten' do
   long_url = params[:url]
-  short_code = shortener.shorten_url(long_url)
+  custom_code = params[:custom_code].empty? ? nil : params[:custom_code]  
 
-  content_type 'text/html'
-  status 200
-
-  "<p>Short URL: <a href='http://localhost:4567/#{short_code}'>http://localhost:4567/#{short_code}</a></p>" \
-  "<p><a href='/qr/#{short_code}'>Get QR Code</a></p>"
+  begin
+    short_code = shortener.shorten_url(long_url, custom_code)
+    content_type 'text/html'
+    status 200
+    "<p>Short URL: <a href='http://localhost:4567/#{short_code}'>http://localhost:4567/#{short_code}</a></p>" \
+    "<p><a href='/qr/#{short_code}'>Get QR Code</a></p>"
+  rescue => e
+    status 400
+    "<p>Error: #{e.message}</p><p><a href='/'>Go back</a></p>"
+  end
 end
 
 # Route to generate QR code for a short URL
