@@ -135,7 +135,7 @@ get '/' do
 end
 
 
-# Route to shorten a URL
+
 # Route to shorten a URL
 post '/shorten' do
   long_url = params[:url]
@@ -145,15 +145,64 @@ post '/shorten' do
     short_code = shortener.shorten_url(long_url, custom_code)
     content_type 'text/html'
     status 200
-
-    "<p>Short URL: <a href='http://localhost:4567/#{short_code}'>http://localhost:4567/#{short_code}</a></p>" \
-    "<p><a href='/qr/#{short_code}'>Get QR Code</a></p>" \
-    "<p><a href='/stats/#{short_code}'>View Statistics</a></p>" # Link to view statistics
+    <<-HTML
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+          }
+          h1 {
+            color: #28a745;
+            font-size: 36px;
+            margin-bottom: 20px;
+          }
+          p {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+          }
+          a {
+            color: #007bff;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>URL Shortened!</h1>
+          <p>Short URL: <a href='http://localhost:4567/#{short_code}'>http://localhost:4567/#{short_code}</a></p>
+          <p><a href='/qr/#{short_code}'>Get QR Code</a></p>
+          <p><a href='/stats/#{short_code}'>View Statistics</a></p>
+          <a href='/'>Shorten another URL</a>
+        </div>
+      </body>
+    </html>
+    HTML
   rescue => e
     status 400
     "<p>Error: #{e.message}</p><a href='/'>Go back</a>"
   end
 end
+
 
 
 # Route to generate QR code for a short URL
@@ -179,12 +228,7 @@ get '/:short_code' do
 end
 
 # Route to display statistics for a short URL
-get '/stats/:short_code' do
-  short_code = params[:short_code]
-  stats = shortener.get_stats(short_code)
 
-  if stats
-    # Route to display statistics for a short URL
 get '/stats/:short_code' do
   short_code = params[:short_code]
   stats = shortener.get_stats(short_code)
@@ -249,7 +293,3 @@ get '/stats/:short_code' do
   end
 end
 
-  else
-    "No statistics available for this short URL."
-  end
-end
