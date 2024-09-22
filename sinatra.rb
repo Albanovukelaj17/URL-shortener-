@@ -65,15 +65,76 @@ shortener = URLShortener.new
 
 # Home route with HTML form
 get '/' do
-  <<-HTML
-    <form action="/shorten" method="POST">
-      <label for="url">Enter URL to shorten:</label>
-      <input type="text" id="url" name="url" required><br><br>
-      <label for="custom_code">Enter custom short code (optional):</label>
-      <input type="text" id="custom_code" name="custom_code"><br><br>
-      <button type="submit">Shorten URL</button>
-    </form>
-  HTML
+  get '/' do
+    <<-HTML
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f4;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+            }
+            .container {
+              background-color: white;
+              padding: 30px;
+              border-radius: 10px;
+              box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+              text-align: center;
+              max-width: 600px;
+              width: 100%;
+            }
+            h1 {
+              color: #333;
+              font-size: 36px;
+              margin-bottom: 20px;
+            }
+            label {
+              font-size: 18px;
+              color: #555;
+            }
+            input[type="text"] {
+              width: 80%;
+              padding: 10px;
+              margin: 20px 0;
+              font-size: 16px;
+              border: 1px solid #ccc;
+              border-radius: 5px;
+            }
+            button {
+              background-color: #28a745;
+              color: white;
+              padding: 10px 20px;
+              font-size: 16px;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+            }
+            button:hover {
+              background-color: #218838;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>URL Shortener</h1>
+            <form action="/shorten" method="POST">
+              <label for="url">Enter URL to shorten:</label><br>
+              <input type="text" id="url" name="url" placeholder="Enter a long URL here..."><br>
+              <label for="custom_code">Optional: Enter custom short code:</label><br>
+              <input type="text" id="custom_code" name="custom_code" placeholder="Enter custom short code (optional)"><br>
+              <button type="submit">Shorten URL</button>
+            </form>
+          </div>
+        </body>
+      </html>
+    HTML
+  end
+  
 end
 
 # Route to shorten a URL
