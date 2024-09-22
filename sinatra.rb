@@ -26,7 +26,7 @@ class URLShortener
 
   def retrieve_url(short_code)
     data = @url_data[short_code]
-    if data:
+    if data
       data['last_accessed'] = Time.now
       data['click_count'] += 1
       save_urls
@@ -35,6 +35,12 @@ class URLShortener
       nil
     end
   end
+
+
+  def get_stats(short_code)
+    @url_data[short_code]
+  end
+
 
   def generate_url_code(url)
     qrcode = RQRCode::QRCode.new(url)
@@ -97,5 +103,22 @@ get '/:short_code' do
     redirect encoded_redirect_url
   else
     "Short URL not found!"
+  end
+
+
+  # Route to display statistics for a short URL
+get '/stats/:short_code' do
+  short_code = params[:short_code]
+  stats = shortener.get_stats(short_code)
+
+  if stats
+    content_type 'text/html'
+    "<h3>Statistics for Short URL: #{short_code}</h3>" \
+    "<p>Original URL: #{URI.decode_www_form_component(stats['long_url'])}</p>" \
+    "<p>Created at: #{stats['created_at']}</p>" \
+    "<p>Last accessed: #{stats['last_accessed'] || 'Never'}</p>" \
+    "<p>Click count: #{stats['click_count']}</p>"
+  else
+    "No statistics available for this short URL."
   end
 end
