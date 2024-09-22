@@ -10,18 +10,24 @@ class URLShortener
     @url_data = load_urls || {}
   end
 
-  def shorten_url(long_url)
-    encoded_url = URI.encode_www_form_component(long_url)
-    short_code = SecureRandom.alphanumeric(6)
-    @url_data[short_code] = {
-      'long_url' => encoded_url,
-      'created_at' => Time.now,
-      'last_access' => nil,
-      'click_count' => 0
-    }
-    save_urls
-    short_code
+  def shorten_url(long_url, custom_code = nil)
+  short_code = custom_code || SecureRandom.alphanumeric(6)
+
+  if @url_data.key?(short_code)
+    raise "Short code '#{short_code}' is already taken. Please choose another one."
   end
+
+  encoded_url = URI.encode_www_form_component(long_url)
+  @url_data[short_code] = {
+    'long_url' => encoded_url,
+    'created_at' => Time.now,
+    'last_access' => nil,
+    'click_count' => 0
+  }
+  save_urls
+  short_code
+end
+
 
   def retrieve_url(short_code)
     data = @url_data[short_code]
