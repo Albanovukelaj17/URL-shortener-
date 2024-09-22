@@ -5,7 +5,6 @@ require 'uri'
 require 'rqrcode'
 require 'time'
 
-
 class URLShortener
   def initialize
     @url_data = load_urls || {}
@@ -15,11 +14,11 @@ class URLShortener
     encoded_url = URI.encode_www_form_component(long_url)
     short_code = SecureRandom.alphanumeric(6)
     @url_data[short_code] = {
-      'long_url' =>encoded_url,
-      'created_at' =>Time.now,
+      'long_url' => encoded_url,
+      'created_at' => Time.now,
       'last_access' => nil,
-      'click_count'=> 0
-       }
+      'click_count' => 0
+    }
     save_urls
     short_code
   end
@@ -36,11 +35,9 @@ class URLShortener
     end
   end
 
-
   def get_stats(short_code)
     @url_data[short_code]
   end
-
 
   def generate_url_code(url)
     qrcode = RQRCode::QRCode.new(url)
@@ -76,7 +73,6 @@ post '/shorten' do
   long_url = params[:url]
   short_code = shortener.shorten_url(long_url)
 
-  # HTML-Content-Type und Status 200
   content_type 'text/html'
   status 200
 
@@ -104,9 +100,9 @@ get '/:short_code' do
   else
     "Short URL not found!"
   end
+end
 
-
-  # Route to display statistics for a short URL
+# Route to display statistics for a short URL
 get '/stats/:short_code' do
   short_code = params[:short_code]
   stats = shortener.get_stats(short_code)
