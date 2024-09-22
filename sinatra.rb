@@ -64,7 +64,9 @@ end
 shortener = URLShortener.new
 
 # Home route with HTML form
+# Route for the home page that shows the form and the list of shortened URLs
 get '/' do
+  urls = shortener.get_all_urls
   <<-HTML
     <html>
       <head>
@@ -73,48 +75,60 @@ get '/' do
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 20px;
           }
           .container {
             background-color: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
             max-width: 600px;
             width: 100%;
+            text-align: center;
           }
           h1 {
             color: #333;
             font-size: 36px;
             margin-bottom: 20px;
           }
-          label {
-            font-size: 18px;
-            color: #555;
+          form {
+            margin-bottom: 20px;
           }
           input[type="text"] {
-            width: 80%;
             padding: 10px;
-            margin: 20px 0;
+            width: 80%;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
           }
           button {
-            background-color: #28a745;
-            color: white;
             padding: 10px 20px;
             font-size: 16px;
+            background-color: #28a745;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
           }
           button:hover {
             background-color: #218838;
+          }
+          ul {
+            list-style-type: none;
+            padding: 0;
+          }
+          li {
+            margin: 10px 0;
+          }
+          a {
+            color: #007bff;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
           }
         </style>
       </head>
@@ -123,16 +137,29 @@ get '/' do
           <h1>URL Shortener</h1>
           <form action="/shorten" method="POST">
             <label for="url">Enter URL to shorten:</label><br>
-            <input type="text" id="url" name="url" placeholder="Enter a long URL here..."><br>
-            <label for="custom_code">Optional: Enter custom short code:</label><br>
-            <input type="text" id="custom_code" name="custom_code" placeholder="Enter custom short code (optional)"><br>
+            <input type="text" id="url" name="url" placeholder="Enter a URL" required><br>
+            <label for="custom_code">Custom Short Code (Optional):</label><br>
+            <input type="text" id="custom_code" name="custom_code" placeholder="Enter a custom short code"><br>
             <button type="submit">Shorten URL</button>
           </form>
+
+          <h2>Existing Short URLs:</h2>
+          <ul>
+            #{urls.map { |code, data| "<li><a href='/#{code}'>http://localhost:4567/#{code}</a> | <a href='/stats/#{code}'>View Stats</a></li>" }.join}
+          </ul>
         </div>
       </body>
     </html>
   HTML
 end
+
+# Method to get all URLs
+class URLShortener
+  def get_all_urls
+    @url_data
+  end
+end
+
 
 
 
