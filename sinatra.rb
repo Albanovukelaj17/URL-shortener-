@@ -184,12 +184,71 @@ get '/stats/:short_code' do
   stats = shortener.get_stats(short_code)
 
   if stats
+    # Route to display statistics for a short URL
+get '/stats/:short_code' do
+  short_code = params[:short_code]
+  stats = shortener.get_stats(short_code)
+
+  if stats
     content_type 'text/html'
-    "<h3>Statistics for Short URL: #{short_code}</h3>" \
-    "<p>Original URL: #{URI.decode_www_form_component(stats['long_url'])}</p>" \
-    "<p>Created at: #{stats['created_at']}</p>" \
-    "<p>Last accessed: #{stats['last_accessed'] || 'Never'}</p>" \
-    "<p>Click count: #{stats['click_count']}</p>"
+    <<-HTML
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+          }
+          h3 {
+            color: #333;
+            font-size: 30px;
+            margin-bottom: 20px;
+          }
+          p {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+          }
+          a {
+            color: #007bff;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h3>Statistics for Short URL: #{short_code}</h3>
+          <p>Original URL: <a href='#{URI.decode_www_form_component(stats['long_url'])}' target="_blank">#{URI.decode_www_form_component(stats['long_url'])}</a></p>
+          <p>Created at: #{stats['created_at']}</p>
+          <p>Last accessed: #{stats['last_accessed'] || 'Never'}</p>
+          <p>Click count: #{stats['click_count']}</p>
+          <a href='/'>Go back</a>
+        </div>
+      </body>
+    </html>
+    HTML
+  else
+    "No statistics available for this short URL."
+  end
+end
+
   else
     "No statistics available for this short URL."
   end
