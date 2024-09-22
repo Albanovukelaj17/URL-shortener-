@@ -65,94 +65,96 @@ shortener = URLShortener.new
 
 # Home route with HTML form
 get '/' do
-  get '/' do
-    <<-HTML
-      <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #f4f4f4;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              margin: 0;
-            }
-            .container {
-              background-color: white;
-              padding: 30px;
-              border-radius: 10px;
-              box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-              text-align: center;
-              max-width: 600px;
-              width: 100%;
-            }
-            h1 {
-              color: #333;
-              font-size: 36px;
-              margin-bottom: 20px;
-            }
-            label {
-              font-size: 18px;
-              color: #555;
-            }
-            input[type="text"] {
-              width: 80%;
-              padding: 10px;
-              margin: 20px 0;
-              font-size: 16px;
-              border: 1px solid #ccc;
-              border-radius: 5px;
-            }
-            button {
-              background-color: #28a745;
-              color: white;
-              padding: 10px 20px;
-              font-size: 16px;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-            }
-            button:hover {
-              background-color: #218838;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>URL Shortener</h1>
-            <form action="/shorten" method="POST">
-              <label for="url">Enter URL to shorten:</label><br>
-              <input type="text" id="url" name="url" placeholder="Enter a long URL here..."><br>
-              <label for="custom_code">Optional: Enter custom short code:</label><br>
-              <input type="text" id="custom_code" name="custom_code" placeholder="Enter custom short code (optional)"><br>
-              <button type="submit">Shorten URL</button>
-            </form>
-          </div>
-        </body>
-      </html>
-    HTML
-  end
-  
+  <<-HTML
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+          }
+          h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 20px;
+          }
+          label {
+            font-size: 18px;
+            color: #555;
+          }
+          input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 20px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+          }
+          button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+          button:hover {
+            background-color: #218838;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>URL Shortener</h1>
+          <form action="/shorten" method="POST">
+            <label for="url">Enter URL to shorten:</label><br>
+            <input type="text" id="url" name="url" placeholder="Enter a long URL here..."><br>
+            <label for="custom_code">Optional: Enter custom short code:</label><br>
+            <input type="text" id="custom_code" name="custom_code" placeholder="Enter custom short code (optional)"><br>
+            <button type="submit">Shorten URL</button>
+          </form>
+        </div>
+      </body>
+    </html>
+  HTML
 end
 
+
+# Route to shorten a URL
 # Route to shorten a URL
 post '/shorten' do
   long_url = params[:url]
-  custom_code = params[:custom_code].empty? ? nil : params[:custom_code]  
-
+  custom_code = params[:custom_code]
+  
   begin
     short_code = shortener.shorten_url(long_url, custom_code)
     content_type 'text/html'
     status 200
+
     "<p>Short URL: <a href='http://localhost:4567/#{short_code}'>http://localhost:4567/#{short_code}</a></p>" \
-    "<p><a href='/qr/#{short_code}'>Get QR Code</a></p>"
+    "<p><a href='/qr/#{short_code}'>Get QR Code</a></p>" \
+    "<p><a href='/stats/#{short_code}'>View Statistics</a></p>" # Link to view statistics
   rescue => e
     status 400
-    "<p>Error: #{e.message}</p><p><a href='/'>Go back</a></p>"
+    "<p>Error: #{e.message}</p><a href='/'>Go back</a>"
   end
 end
+
 
 # Route to generate QR code for a short URL
 get '/qr/:short_code' do
